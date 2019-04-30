@@ -67,7 +67,7 @@ plot_weights(w,y)
 
 ##
 
-alpha = 4e-3
+alpha = 1e-3
 w= [np.array([0,0,0])]
 Rinv = np.linalg.inv(R_x)
 y_pred = []
@@ -76,9 +76,13 @@ for k in range(1,N-1):
     inp = x[k-1:k+2]
     y_pred += [np.sum(inp * w[-1])]
     e += [y[k]-y_pred[-1]]         
-    w += [ w[-1] + 2 * alpha * inp * e[-1]]
+    w += [ w[-1] + 2 * alpha * np.array(inp) * e[-1]]
+    
 
 w = np.array(w)
+w = np.array([w[:,1],w[:,0],w[:,2]]).T
 plot_weights(w,y)
+
+
 
 
