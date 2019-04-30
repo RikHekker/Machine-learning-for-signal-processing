@@ -100,8 +100,34 @@ for k in range(1,N-1):
     
 
 w = np.array(w)
-#w = np.array([w[:,1],w[:,0],w[:,2]]).T
+w = np.array([w[:,1],w[:,0],w[:,2]]).T
 plot_weights(w,y)
 
+
+## RLS
+w= [np.array([0,0,0])]
+sigma = 1e-5
+r_yx_pred = np.zeros(3)
+R_xinv_pred = np.eye(3) * sigma
+gamma = 1-1e-4
+y_pred = []
+e = []
+for k in range(1,N-2):
+    inp_next = np.array(x[k:k+3])
+    # g_next_denominator is a scalar
+    g_next_denominator = gamma**2 + np.matmul(np.matmul(inp_next.T,R_xinv_pred),inp_next)
+
+    g_next = np.matmul(R_xinv_pred,inp_next)/g_next_denominator
+    R_xinv_pred_next = gamma**-2 * (R_xinv_pred-np.matmul(g_next*inp_next,R_xinv_pred))
+    r_yx_pred_next = gamma**2 * r_yx_pred + inp_next * y[k+1]
+    w+=[np.matmul(R_xinv_pred_next, r_yx_pred_next)]
+    r_yx_pred = r_yx_pred_next
+    R_xinv_pred = R_xinv_pred_next
+
+w = np.array(w)  
+w = np.array([w[:,1],w[:,0],w[:,2]]).T
+plot_weights(w,y)
+
+ 
 
 
