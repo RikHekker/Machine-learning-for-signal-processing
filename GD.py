@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 data=pd.read_csv('assignment1_data.csv')
 x=data.A
 y=data.B
-alpha=1/8
+alpha=1/20
 w_o = np.array([0.2 ,1, -0.5])
 w = [w_o]
 w= [np.array([0,0,0])]
@@ -21,7 +21,7 @@ for k in range(3,N):
     
     w +=   [w[-1] + 2*alpha*(r_yx-np.matmul(R_x,w[-1]))]
 
-#w = np.array(w)
+w = np.array(w)
 #plt.figure()
 #plt.plot(w[:,0])
 #plt.plot(w[:,1])
@@ -49,3 +49,9 @@ plt.xlabel('w_0')
 plt.ylabel('w_1')
 
 plt.show()
+
+## 
+
+
+
+
