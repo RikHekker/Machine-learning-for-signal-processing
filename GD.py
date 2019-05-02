@@ -115,9 +115,9 @@ e = []
 for k in range(1,N-2):
     inp_next = np.array(x[k:k+3])
     # g_next_denominator is a scalar
-    g_next_denominator = gamma**2 + np.matmul(np.matmul(inp_next.T,R_xinv_pred),inp_next)
+    g_next_denominator = gamma**2 + inp_next.T*R_xinv_pred*inp_next
 
-    g_next = np.matmul(R_xinv_pred,inp_next)/g_next_denominator
+    g_next = R_xinv_pred*inp_next/g_next_denominator
     R_xinv_pred_next = gamma**-2 * (R_xinv_pred-np.dot(g_next,inp_next.T)*R_xinv_pred)
     r_yx_pred_next = gamma**2 * r_yx_pred + inp_next.T*y[k+1]
     w+=[np.dot(R_xinv_pred_next, r_yx_pred_next)]
