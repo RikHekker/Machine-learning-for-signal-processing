@@ -4,9 +4,14 @@ def calculate_MSE_weights(x,y):
     x_ = x.mean(axis=0)
     y_ = y.mean()
     xy__ = [(x[:,0]*y).mean(),(x[:,1]*y).mean()]
+    
     w = (xy__ - x_*y_)/((x**2).mean(axis=0) - x_**2)
     b = y_ - np.matmul(w.T, x_) 
+    
     return w,b
+
+def calculate_MSE_weights2(x,y):
+     
 
 x = np.array([[0,0],[0.1,1],[1,0.2],[1,1]])
 y = np.array([0,0.41,0.18,0.5])
