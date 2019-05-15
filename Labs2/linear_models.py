@@ -11,25 +11,33 @@ def calculate_MSE_weights(x,y):
     return w,b
 
 def calculate_MSE_weights2(x,y):
-     
+    x = np.array([[0,0],[0.1,1],[1,0.2],[1,1]])
+    y = np.array([0,0.41,0.18,0.5])
+    
+    w,b = calculate_MSE_weights(x,y)
+    
+    y_pred = []
+    e = []
+    for i in range(4):
+        y_pred += [np.matmul(w.T,x[i]) + b]
+        e += [abs(y_pred[-1] - y[i])]
 
-x = np.array([[0,0],[0.1,1],[1,0.2],[1,1]])
-y = np.array([0,0.41,0.18,0.5])
-
-w,b = calculate_MSE_weights(x,y)
-
-y_pred = []
-e = []
-for i in range(4):
-    y_pred += [np.matmul(w.T,x[i]) + b]
-    e += [abs(y_pred[-1] - y[i])]
-
+def calculate_MSE_weights3():
+    x = np.array([[0,0.1,1,1],[0,1,0.2,1],[1,1,1,1]])
+    y = np.array([-0.416,0.3610,0.1222,0.473])
+    R=np.matmul(x,np.transpose(x))
+    Rinv=np.linalg.inv(R)
+    r=np.matmul(x,y)
+    w=np.dot(Rinv,r)
+    b=w[-1]
+    w=w[:-1]
+    return w,b
 ## Recalculating inputs
 
 x = np.array([[0,0],[0.1,1],[1,0.2],[1,1]])
 y = np.array([-0.416,0.3610,0.1222,0.473])
 
-w,b = calculate_MSE_weights(x,y)
+w,b = calculate_MSE_weights3()
 
 
 y_pred = []
