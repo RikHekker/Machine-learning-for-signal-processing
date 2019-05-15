@@ -29,7 +29,8 @@ plt.plot(X[0,2],X[1,2],'g o')
 plt.plot(X[0,3],X[1,3],'r o')
 plt.plot(decision[0],decision[1],'--')
 plt.grid(1)
-
+plt.xlabel('x1')
+plt.ylabel('x2')
 
 h = apply_transformation(X)
 #decision_transformed = apply_transformation(decision)
@@ -47,8 +48,11 @@ plt.figure()
 plt.plot(h[0,[0,3]],h[1,[0,3]],'r o')
 plt.plot(h[0,[1,2]],h[1,[1,2]],'g o')
 plt.plot(decision[0],decision[1],'--')
+plt.xlabel('h1')
+plt.ylabel('h2')
+
 #
 #
 plt.grid(1)
 
-
+plt.show()
