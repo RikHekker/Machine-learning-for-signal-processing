@@ -89,7 +89,7 @@ def plot_results(z_out,J_arr,name):
 
     plt.figure()
     plt.plot(J_arr)
-    
+    plt.grid(1)
     false_idx = np.argwhere(np.round(z_out[0]) == 0)
     true_idx = np.argwhere(np.round(z_out[0]) == 1)
     plt.savefig("regularizationplots\\"+name + "_Loss.jpg")
