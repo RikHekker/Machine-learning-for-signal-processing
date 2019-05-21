@@ -31,10 +31,12 @@ def load_data():
 
 w2,W1,b1,b2,X,y,J_arr = load_data()
 
+
+
 batch_size=100
 no_batches = int(X.shape[1]/batch_size)
 no_iter = 50000
-mu=0.001
+mu=0.0001
 
 for i in range(no_iter):
     for b in range(no_batches):
@@ -53,29 +55,30 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2):
 
     plt.figure()
     plt.plot(J_arr)
-    plt.xlabel("#Iterations")
+    plt.xlabel("Epoch")
     plt.ylabel("Loss")
-
     plt.savefig("plots\\"+name + "_Loss.jpg")
     
     false_idx = np.argwhere(np.round(z_out[0]) == 0)
     true_idx = np.argwhere(np.round(z_out[0]) == 1)
     
     plt.figure()
-    plt.scatter(Xbatch[0,false_idx],Xbatch[1,false_idx])
-    plt.scatter(Xbatch[0,true_idx],Xbatch[1,true_idx])
+    plt.scatter(Xbatch[0,false_idx],Xbatch[1,false_idx],label = "0")
+    plt.scatter(Xbatch[0,true_idx],Xbatch[1,true_idx],label = "1")
     plt.grid(1)
     plt.xlabel("x1")
     plt.ylabel("x2")
+    plt.legend()
     plt.savefig("plots\\"+name + "_scatter.jpg")
     
     b1 = np.array(b1)
 	
     plt.figure()
-    plt.plot(b1[:,0,0])
-    plt.plot(b1[:,1,0])
-    plt.xlabel("#Iterations")
+    plt.plot(b1[:,0,0],label = "b1_1")
+    plt.plot(b1[:,1,0],label = "b1_2")
+    plt.xlabel("Epoch")
     plt.ylabel("Value")
+    plt.legend()
     plt.grid(1)
 	
 
@@ -85,19 +88,20 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2):
     plt.figure()
     plt.plot(b2[:,0,0])
     plt.savefig("plots\\"+name+"b2.jpg")
-    plt.xlabel("#Iterations")
+    plt.xlabel("Epoch")
     plt.ylabel("Value")
     plt.grid(1)
 
     
     W1 = np.array(W1)
     plt.figure()
-    plt.plot(W1[:,0,0])
-    plt.plot(W1[:,0,1])
-    plt.plot(W1[:,1,0])
-    plt.plot(W1[:,1,1])
-    plt.xlabel("#Iterations")
+    plt.plot(W1[:,0,0],label = "W1_11")
+    plt.plot(W1[:,0,1],label = "W1_12")
+    plt.plot(W1[:,1,0],label = "W1_21")
+    plt.plot(W1[:,1,1],label = "W1_22")
+    plt.xlabel("Epoch")
     plt.ylabel("Value")
+    plt.legend()
     plt.grid(1)
 
 
@@ -105,17 +109,19 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2):
     
     w2 = np.array(w2)
     plt.figure()
-    plt.plot(w2[:,0,0])
-    plt.plot(w2[:,1,0])
-    plt.xlabel("#Iterations")
+    plt.plot(w2[:,0,0],label="w2_1")
+    plt.plot(w2[:,1,0],label="w2_2")
+    
+    plt.xlabel("Epoch")
     plt.ylabel("Value")
+    plt.legend()
     plt.grid(1)
 
     plt.savefig("plots\\"+name+"w2.jpg")
 
 plot_results(z_out,J_arr,"SGD",b1,b2,W1,w2)
 #plt.show()
-
+J_SGD = J_arr
 
 #%% # Momentum %%
 w2,W1,b1,b2,x,y,J_arr = load_data()
@@ -150,7 +156,7 @@ for i in range(no_iter):
 
 
 plot_results(z_out,J_arr,"SGDm",b1,b2,W1,w2)
-
+J_SGDm = J_arr
 #%% # Adagrad
 
 w2,W1,b1,b2,x,y,J_arr = load_data()
@@ -189,6 +195,7 @@ for i in range(no_iter):
 
 plot_results(z_out,J_arr,"adaGrad",b1,b2,W1,w2)
 
+J_adagrad = J_arr
 #%% # RMSPROP
 
 w2,W1,b1,b2,x,y,J_arr = load_data()
@@ -224,7 +231,7 @@ for i in range(no_iter):
         J_arr+=[J]
 
 plot_results(z_out,J_arr,"RMSprop",b1,b2,W1,w2)
-
+J_RMS = J_arr
 ##
 
 #%% # adam
@@ -274,6 +281,21 @@ for k in range(1,no_iter):
         J_arr+=[J]
 
 plot_results(z_out,J_arr,"adam",b1,b2,W1,w2)
+
+J_adam = J_arr
+
+#%%
+plt.figure()
+plt.plot(J_SGD,label = "SGD")
+plt.plot(J_SGDm,label = "SGDm")
+plt.plot(J_adagrad,label = "AdaGrad")
+plt.plot(J_RMS,label = "RMSProp")
+plt.plot(J_adam,label = "Adam")
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.legend()
+plt.grid(1)
+plt.savefig("plots\\compare_Loss.jpg")
 
 
 
