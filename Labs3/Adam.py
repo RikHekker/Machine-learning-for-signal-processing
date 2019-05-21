@@ -46,7 +46,7 @@ def converge(update,lam):
     
     y_der= []
     J_arr = []
-    no_iter = 1000
+    no_iter = 50000
     
     w2=data["w2_init"].astype(float)
     W1=data["W1_init"].astype(float)
@@ -92,13 +92,18 @@ def plot_results(z_out,J_arr,name):
     plt.grid(1)
     false_idx = np.argwhere(np.round(z_out[0]) == 0)
     true_idx = np.argwhere(np.round(z_out[0]) == 1)
+    plt.xlabel("#samples")
+    plt.ylabel("Loss")
     plt.savefig("regularizationplots\\"+name + "_Loss.jpg")
     
     
     plt.figure()
-    plt.scatter(Xbatch[0,false_idx],Xbatch[1,false_idx])
-    plt.scatter(Xbatch[0,true_idx],Xbatch[1,true_idx])
+    plt.scatter(Xbatch[0,false_idx],Xbatch[1,false_idx],label = "0")
+    plt.scatter(Xbatch[0,true_idx],Xbatch[1,true_idx],label = "1")
     plt.grid(1)
+    plt.xlabel("x1")
+    plt.ylabel("x2")
+    plt.legend()
     plt.savefig("regularizationplots\\"+name + "_scatter.jpg")
 
 
