@@ -23,10 +23,10 @@ batch_size=100;
 no_batches = int(X.shape[1]/batch_size)
 y_der= []
 J_arr = []
-no_iter = 1000
+no_iter = 50000
 
 def relu(x):
-    initialRotation =  np.matmul(w1,x) + b1[np.newaxis,:].T
+    initialRotation =  np.matmul(W1,x) + b1[np.newaxis,:].T
     maxed =  np.maximum(initialRotation,np.zeros_like(initialRotation))
     return maxed
 def sigmoid(x):
@@ -55,6 +55,14 @@ for i in range(no_iter):
 plt.figure()
 plt.plot(J_arr)
 
+false_idx = np.argwhere(np.round(z_out[0]) == 0)
+true_idx = np.argwhere(np.round(z_out[0]) == 1)
+    
+plt.figure()
+plt.scatter(Xbatch[0,false_idx],Xbatch[1,false_idx])
+plt.scatter(Xbatch[0,true_idx],Xbatch[1,true_idx])
+plt.grid(1)
+
 
 
 
@@ -64,7 +72,7 @@ b2=data["b2_init"].astype(float)
 b1=data["b1_init"].astype(float)
 X = data["X"].astype(float)
 y = data["y"].astype(float)
-
+J_arr = []
 rho = 0.9
 
 dJ_db1_list= [np.zeros_like(b1)]
@@ -72,7 +80,7 @@ dJ_db2_list= [np.zeros_like(b2)]
 dJ_dW1_list= [np.zeros_like(W1)]
 dJ_dw2_list= [np.zeros_like(w2)]
 
-no_iter = 5000
+no_iter = 50000
 
 
 
@@ -99,6 +107,14 @@ for i in range(no_iter):
 plt.figure()
 plt.plot(J_arr)
 
+false_idx = np.argwhere(np.round(z_out[0]) == 0)
+true_idx = np.argwhere(np.round(z_out[0]) == 1)
+    
+plt.figure()
+plt.scatter(Xbatch[0,false_idx],Xbatch[1,false_idx])
+plt.scatter(Xbatch[0,true_idx],Xbatch[1,true_idx])
+plt.grid(1)
+
 ## Adagrad
 
 w2=data["w2_init"].astype(float)
@@ -114,7 +130,7 @@ rk_w2 = [0]
 rk_b1 = [0]
 rk_b2 = [0]
 
-no_iter = 5000
+no_iter = 50000
 
 delta = 1e-10
 
@@ -144,6 +160,14 @@ for i in range(no_iter):
 plt.figure()
 plt.plot(J_arr)
 
+false_idx = np.argwhere(np.round(z_out[0]) == 0)
+true_idx = np.argwhere(np.round(z_out[0]) == 1)
+    
+plt.figure()
+plt.scatter(Xbatch[0,false_idx],Xbatch[1,false_idx])
+plt.scatter(Xbatch[0,true_idx],Xbatch[1,true_idx])
+plt.grid(1)
+
 ## RMSPROP
 
 
@@ -160,7 +184,7 @@ rk_w2 = [0]
 rk_b1 = [0]
 rk_b2 = [0]
 
-no_iter = 5000
+no_iter = 50000
 
 delta = 1e-10
 
@@ -190,6 +214,14 @@ for i in range(no_iter):
 plt.figure()
 plt.plot(J_arr)
 
+false_idx = np.argwhere(np.round(z_out[0]) == 0)
+true_idx = np.argwhere(np.round(z_out[0]) == 1)
+    
+plt.figure()
+plt.scatter(Xbatch[0,false_idx],Xbatch[1,false_idx])
+plt.scatter(Xbatch[0,true_idx],Xbatch[1,true_idx])
+plt.grid(1)
+
 ##
 
 ## RMSPROP
@@ -214,7 +246,7 @@ sk_b1 = [0]
 sk_b2 = [0]
 
 
-no_iter = 1
+no_iter = 50000
 
 eps = 1e-10
 rho_1 = 0.9
@@ -257,3 +289,12 @@ for k in range(no_iter):
 
 plt.figure()
 plt.plot(J_arr)
+
+    
+false_idx = np.argwhere(np.round(z_out[0]) == 0)
+true_idx = np.argwhere(np.round(z_out[0]) == 1)
+    
+plt.figure()
+plt.scatter(Xbatch[0,false_idx],Xbatch[1,false_idx])
+plt.scatter(Xbatch[0,true_idx],Xbatch[1,true_idx])
+plt.grid(1)
