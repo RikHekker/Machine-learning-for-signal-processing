@@ -33,7 +33,7 @@ w2,W1,b1,b2,X,y,J_arr = load_data()
 
 batch_size=100
 no_batches = int(X.shape[1]/batch_size)
-no_iter = 10000
+no_iter = 50000
 mu=0.001
 
 for i in range(no_iter):
@@ -53,6 +53,9 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2):
 
     plt.figure()
     plt.plot(J_arr)
+    plt.xlabel("#Iterations")
+    plt.ylabel("Loss")
+
     plt.savefig("plots\\"+name + "_Loss.jpg")
     
     false_idx = np.argwhere(np.round(z_out[0]) == 0)
@@ -62,6 +65,8 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2):
     plt.scatter(Xbatch[0,false_idx],Xbatch[1,false_idx])
     plt.scatter(Xbatch[0,true_idx],Xbatch[1,true_idx])
     plt.grid(1)
+    plt.xlabel("x1")
+    plt.ylabel("x2")
     plt.savefig("plots\\"+name + "_scatter.jpg")
     
     b1 = np.array(b1)
@@ -69,7 +74,7 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2):
     plt.figure()
     plt.plot(b1[:,0,0])
     plt.plot(b1[:,1,0])
-    plt.xlabel("#Samples")
+    plt.xlabel("#Iterations")
     plt.ylabel("Value")
     plt.grid(1)
 	
@@ -80,7 +85,7 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2):
     plt.figure()
     plt.plot(b2[:,0,0])
     plt.savefig("plots\\"+name+"b2.jpg")
-    plt.xlabel("#Samples")
+    plt.xlabel("#Iterations")
     plt.ylabel("Value")
     plt.grid(1)
 
@@ -91,7 +96,7 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2):
     plt.plot(W1[:,0,1])
     plt.plot(W1[:,1,0])
     plt.plot(W1[:,1,1])
-    plt.xlabel("#Samples")
+    plt.xlabel("#Iterations")
     plt.ylabel("Value")
     plt.grid(1)
 
@@ -102,7 +107,7 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2):
     plt.figure()
     plt.plot(w2[:,0,0])
     plt.plot(w2[:,1,0])
-    plt.xlabel("#Samples")
+    plt.xlabel("#Iterations")
     plt.ylabel("Value")
     plt.grid(1)
 
@@ -121,8 +126,6 @@ dJ_db1_list= [np.zeros_like(b1)]
 dJ_db2_list= [np.zeros_like(b2)]
 dJ_dW1_list= [np.zeros_like(W1)]
 dJ_dw2_list= [np.zeros_like(w2)]
-
-no_iter = 10000
 
 
 for i in range(no_iter):
@@ -271,3 +274,6 @@ for k in range(1,no_iter):
         J_arr+=[J]
 
 plot_results(z_out,J_arr,"adam",b1,b2,W1,w2)
+
+
+
