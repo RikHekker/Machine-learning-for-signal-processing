@@ -49,7 +49,7 @@ def converge(update,lam):
     batch_size=100;
     
     J_arr = []
-    no_iter = 50000
+    no_iter = 1000
     
     w2=[data["w2_init"].astype(float)]
     W1=[data["W1_init"].astype(float)]
@@ -97,7 +97,7 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2,Xbatch):
     plt.xlabel("#Iterations")
     plt.ylabel("Loss")
 
-    plt.savefig("plots\\"+name + "_Loss.jpg")
+    plt.savefig("regularizationplots\\"+name + "_Loss.jpg")
     
     false_idx = np.argwhere(np.round(z_out[0]) == 0)
     true_idx = np.argwhere(np.round(z_out[0]) == 1)
@@ -108,7 +108,7 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2,Xbatch):
     plt.grid(1)
     plt.xlabel("x1")
     plt.ylabel("x2")
-    plt.savefig("plots\\"+name + "_scatter.jpg")
+    plt.savefig("regularizationplots\\"+name + "_scatter.jpg")
     
     b1 = np.array(b1)
 	
@@ -120,12 +120,12 @@ def plot_results(z_out,J_arr,name, b1,b2,W1,w2,Xbatch):
     plt.grid(1)
 	
 
-    plt.savefig("plots\\"+name+"b1.jpg")
+    plt.savefig("regularizationplots\\"+name+"b1.jpg")
     
     b2 = np.array(b2)
     plt.figure()
     plt.plot(b2[:,0,0])
-    plt.savefig("plots\\"+name+"b2.jpg")
+    plt.savefig("regularizationplots\\"+name+"b2.jpg")
     plt.xlabel("#Iterations")
     plt.ylabel("Value")
     plt.grid(1)
@@ -164,7 +164,7 @@ plot_results(z_out,J_arr,name, b1,b2,W1,w2,Xbatch)
 for lam in [0.001, 0.01, 0.1]:
     for update in [adam_update_l1,adam_update_l2]:
         z_out,J_arr, b1,b2,W1,w2,Xbatch = converge(update,lam)
-        name = "lambda_{0}".format(lam) + "_update_"+ str(update.__name__)
+        name = "lambda_{0}".format(lam).replace(".","") + "_update_"+ str(update.__name__)
         
         plot_results(z_out,J_arr,name, b1,b2,W1,w2,Xbatch)
 

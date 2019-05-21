@@ -42,9 +42,9 @@ def plot_results(J_arr_arr,name,learning_rates):
 
 batch_size=100
 
-no_iter = 1000
+no_iter = 2000
 
-learning_rates =[0.001,0.005,0.01,0.03,0.1]
+learning_rates =[0.001,0.005,0.01,0.03,0.05]
 J_arr_arr = []
 for mu in  learning_rates:
    w2,W1,b1,b2,X,y,J_arr = load_data()
