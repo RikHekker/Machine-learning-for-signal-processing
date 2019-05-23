@@ -254,7 +254,6 @@ sk_b2 = [0]
 eps = 1e-10
 rho_1 = 0.9
 rho_2 = 0.999
-mu = 0.0001
 
 def adam_update(delta,sk,rk,k,param):
     sk+=[rho_1 * sk[-1] + (1-rho_1) * delta]
