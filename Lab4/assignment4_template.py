@@ -69,7 +69,17 @@ x_batches, y_batches, data_x_train, data_y_train, data_x_test, data_y_test = get
 def Encoder(input_shape):
     #ENCODER
     f=Sequential()
-    
+    f.add(Conv2D(16, (3, 3), activation='relu', padding='same',input_shape=(input_shape)))
+    f.add(MaxPooling2D((2, 2), padding='same'))
+    f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
+    f.add(MaxPooling2D((2, 2), padding='same'))
+    f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
+    f.add(MaxPooling2D((2, 2), padding='same'))
+    f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
+    f.add(MaxPooling2D((2, 2), padding='same'))
+    f.add(Conv2D(1, (3, 3), activation='relu', padding='same'))
+    f.add(MaxPooling2D((2, 1), padding='same'))
+    #f.summary()
     """
     Complete this part
     """
@@ -78,7 +88,26 @@ def Encoder(input_shape):
     
 def Decoder(input_shape):
     f=Sequential()
-    
+    f.add(UpSampling2D((2, 1),input_shape=(input_shape)))
+    print(f.output_shape)
+    f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
+    print(f.output_shape)
+
+    f.add(UpSampling2D((2, 2)))
+    print(f.output_shape)
+
+    f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
+    print(f.output_shape)
+
+    f.add(UpSampling2D((2, 2)))
+    print(f.output_shape)
+
+    f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
+    f.add(UpSampling2D((2, 2)))
+    f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
+    f.add(UpSampling2D((2, 2)))
+    f.add(Conv2D(1, (3, 3), activation='relu', padding='same'))
+    f.summary()
     """
     Complete this part
     """
@@ -90,21 +119,29 @@ def Decoder(input_shape):
 #Create models    
 input_shape = x_batches.shape[2:]
 encoder=Encoder(input_shape)
-input_shape=encoder.output_shape[1:]
-decoder=Decoder(input_shape)
-
+input_shape_decoder=encoder.output_shape[1:]
+decoder=Decoder(input_shape_decoder)
+print(decoder.output_shape)
 input_shape=x_batches.shape[2:]
 inputs=Input(input_shape)
 encoded=encoder(inputs)
 decoded=decoder(encoded)
+
 model=tf.keras.Model(inputs=inputs,outputs=decoded)
-
 model.compile('adam', loss=lambda yt,yp: MSE(inputs, decoded))
+loss=[]
+for i in range(args['epochs']): 
+    history=model.fit(x_batches[i], y_batches[i])
+    loss+=[history.history['loss']]
+plt.plot(loss)
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.show()
 
+pred=decoder(encoder(x_batches[0])).eval()
+for i in range(10):
+    plt.figure()
+    plt.imshow((pred[i,:,:,0]),cmap='gray')
+plt.show()
 
-for epoch in range(args['epochs']):
-    print("epoch: ",epoch)
-    for batch in x_batches:
-        """
-        complete here
-        """
