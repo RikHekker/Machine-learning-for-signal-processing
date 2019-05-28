@@ -25,13 +25,13 @@ from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
 
 import sklearn
-from sklearn.neighbors import NearestNeighbors
+#%%
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.datasets import fetch_openml
-
-sess = tf.Session()
-
-epochs = 20
+#%%
+epochs = 1
 batch_size=10000
+
 
 def build_batches(x, n):
     m = (x.shape[0] // n) * n
@@ -91,63 +91,120 @@ def Encoder(input_shape):
 def Decoder(input_shape):
     f=Sequential()
     f.add(UpSampling2D((2, 1),input_shape=(input_shape)))
-    print(f.output_shape)
-    f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
-    print(f.output_shape)
-
-    f.add(UpSampling2D((2, 2)))
-    print(f.output_shape)
-
-    f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
-    print(f.output_shape)
-
-    f.add(UpSampling2D((2, 2)))
-    print(f.output_shape)
-
     f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
     f.add(UpSampling2D((2, 2)))
     f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
     f.add(UpSampling2D((2, 2)))
-    f.add(Conv2D(1, (3, 3), activation='tanh', padding='same'))
+    f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
+    f.add(UpSampling2D((2, 2)))
+    f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
+    f.add(UpSampling2D((2, 2)))
+    f.add(Conv2D(1, (3, 3), activation='relu', padding='same'))
     f.summary()
     """
     Complete this part
     """
     
     return f
+    
+        
+    
+    #%%Create models    
+session = tf.Session()
+with session.as_default():
+    input_shape = x_batches.shape[2:]
+    encoder=Encoder(input_shape)
+    input_shape_decoder=encoder.output_shape[1:]
+    decoder=Decoder(input_shape_decoder)
+    print(decoder.output_shape)
+    input_shape=x_batches.shape[2:]
+    inputs=Input(input_shape)
+    encoded=encoder(inputs)
+    decoded=decoder(encoded)
+    
+    saver = tf.train.Saver()
+    saver.restore(session,"data\\model.ckpt")
+    
+    model=tf.keras.Model(inputs=inputs,outputs=decoded)
+    model.compile('adam', loss=lambda yt,yp: MSE(inputs, decoded))
+    loss=[]
+    for i in range(epochs): 
+        batch_idx = random.randint(0,x_batches.shape[0]-1)
+        shuffle_idx = np.random.permutation(batch_size)
+       
+        history=model.fit(x_batches[batch_idx,shuffle_idx], y_batches[batch_idx,shuffle_idx])
+        loss+=[history.history['loss']]
+    
+    saver.save(session,"data\\model.ckpt")    
+    plt.plot(loss)
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+        #%%
 
+    pred=decoder(encoder(x_batches[0])).eval()
+#    for i in range(10):
+#        plt.figure()
+#        plt.imshow((pred[i,:,:,0]),cmap='gray')
+    
+    pred=encoder(data_x_train).eval()
+    test_encoded = encoder(data_x_test).eval()
+#%%
+
+plt.figure()
+for i in range(10):
+    idx_digit = np.argwhere(data_y_train == i)
+    pred_digit = pred[idx_digit[:,0]]
+    print(pred_digit.shape)
+    plt.scatter(pred_digit[:,:,0],pred_digit[:,:,1],label = "digit {}".format(i))        
+plt.xlabel("x1")
+plt.ylabel("x2")
+
+plt.grid(1)
+plt.legend()
+plt.show()
+
+#%%
+data_y_train = np.array( [int (item) for item in data_y_train])
+data_y_test = np.array( [int (item) for item in data_y_test])
+nbrs=KNeighborsClassifier(n_neighbors=1).fit(pred[:,0,:,0],data_y_train)
+#%%
+pred_y_test=nbrs.predict(test_encoded[:,0,:,0])
+
+
+
+
+
+#%%
+
+percentage=[]
+for i in range(10):
+    idx_digit = np.argwhere(data_y_test == i)
+    good=np.argwhere(pred_y_test[idx_digit[:,0]]==data_y_test[idx_digit[:,0]])
+    percentage+=[len(good[:,0])/idx_digit.shape[0]]
     
 
-#%%Create models    
-input_shape = x_batches.shape[2:]
-encoder=Encoder(input_shape)
-input_shape_decoder=encoder.output_shape[1:]
-decoder=Decoder(input_shape_decoder)
-print(decoder.output_shape)
-input_shape=x_batches.shape[2:]
-inputs=Input(input_shape)
-encoded=encoder(inputs)
-decoded=decoder(encoded)
+    
+ #%%
+ #   
+with session.as_default():
+    x=np.linspace(0,0.6,15)
+    X,Y = np.meshgrid(x,x)
+    
+    megaplaatje = np.zeros((32*15,32*15))
+    
+    plt.figure()
+    for idx_y,y in enumerate(np.linspace(0,1.6,15)):
+        for idx_x, x in enumerate(np.linspace(0,3,15)):
+            inp = tf.convert_to_tensor(np.array([[[[x],[y]]]]),dtype = np.float32)
+            plaatje = decoder(inp).eval()
+            start_y = idx_y * 32
+            stop_y = start_y + 32
+            start_x = idx_x * 32
+            stop_x = start_x + 32
+            print("done {} out of {}".format(idx_x + idx_y * 15,15*15))
+            
+            megaplaatje[start_y:stop_y,start_x:stop_x] = plaatje[0,:,:,0]
 
-model=tf.keras.Model(inputs=inputs,outputs=decoded)
-model.compile('adam', loss=lambda yt,yp: MSE(inputs, decoded))
-loss=[]
-for i in range(5): 
-    batch_idx = random.randint(0,x_batches.shape[0]-1)
-    shuffle_idx = np.random.permutation(batch_size)
-   
-    history=model.fit(x_batches[batch_idx,shuffle_idx], y_batches[batch_idx,shuffle_idx])
-    loss+=[history.history['loss']]
-plt.plot(loss)
-plt.title('model loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
+plt.imshow(megaplaatje)
 plt.show()
-#%%
-with sess.as_default():
-    pred=decoder(encoder(x_batches[0])).eval()
-    for i in range(10):
-        plt.figure()
-        plt.imshow((pred[i,:,:,0]),cmap='gray')
-    plt.show()
-
