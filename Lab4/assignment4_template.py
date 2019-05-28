@@ -13,7 +13,7 @@ from collections import defaultdict
 
 import numpy as np
 import math
-
+import random
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.layers import Input, Dense, Conv2D, LeakyReLU, AvgPool2D, UpSampling2D, ReLU, MaxPooling2D, Reshape
@@ -28,11 +28,10 @@ import sklearn
 from sklearn.neighbors import NearestNeighbors
 from sklearn.datasets import fetch_openml
 
-args = {
-    'epochs': 10,    
-    'batch_size': 64
-}
+sess = tf.Session()
 
+epochs = 20
+batch_size=10000
 
 def build_batches(x, n):
     m = (x.shape[0] // n) * n
@@ -42,8 +41,9 @@ def get_mnist32_batches(batch_size, data_format='channels_last'):
     maxNum_data_train=10000 #reduce data size for computational load
     maxNum_data_test=1000
     channel_index = 1 if data_format == 'channels_first' else 3
-    mnist = fetch_openml('mnist_784',cache= False)
+    mnist = fetch_openml('mnist_784')
     data_x = mnist['data'].reshape(-1,28,28).astype(np.float32) / 255.
+    print(data_x.shape)
     #Reduce dimensions of dataset to reduce computations times
     np.random.seed(42) #seed to ensure reproducible results
     randomIndices=np.random.permutation(np.size(data_x,0))
@@ -64,8 +64,10 @@ def get_mnist32_batches(batch_size, data_format='channels_last'):
     x_batches = build_batches(data_x_train[indices], batch_size)
     return x_batches, y_batches, data_x_train, data_y_train, data_x_test, data_y_test
 
-x_batches, y_batches, data_x_train, data_y_train, data_x_test, data_y_test = get_mnist32_batches(args['batch_size'])
+x_batches, y_batches, data_x_train, data_y_train, data_x_test, data_y_test = get_mnist32_batches(batch_size)
 
+
+#%% Model definition
 def Encoder(input_shape):
     #ENCODER
     f=Sequential()
@@ -106,7 +108,7 @@ def Decoder(input_shape):
     f.add(UpSampling2D((2, 2)))
     f.add(Conv2D(16, (3, 3), activation='relu', padding='same'))
     f.add(UpSampling2D((2, 2)))
-    f.add(Conv2D(1, (3, 3), activation='relu', padding='same'))
+    f.add(Conv2D(1, (3, 3), activation='tanh', padding='same'))
     f.summary()
     """
     Complete this part
@@ -116,7 +118,7 @@ def Decoder(input_shape):
 
     
 
-#Create models    
+#%%Create models    
 input_shape = x_batches.shape[2:]
 encoder=Encoder(input_shape)
 input_shape_decoder=encoder.output_shape[1:]
@@ -130,18 +132,22 @@ decoded=decoder(encoded)
 model=tf.keras.Model(inputs=inputs,outputs=decoded)
 model.compile('adam', loss=lambda yt,yp: MSE(inputs, decoded))
 loss=[]
-for i in range(args['epochs']): 
-    history=model.fit(x_batches[i], y_batches[i])
+for i in range(5): 
+    batch_idx = random.randint(0,x_batches.shape[0]-1)
+    shuffle_idx = np.random.permutation(batch_size)
+   
+    history=model.fit(x_batches[batch_idx,shuffle_idx], y_batches[batch_idx,shuffle_idx])
     loss+=[history.history['loss']]
 plt.plot(loss)
 plt.title('model loss')
 plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.show()
-
-pred=decoder(encoder(x_batches[0])).eval()
-for i in range(10):
-    plt.figure()
-    plt.imshow((pred[i,:,:,0]),cmap='gray')
-plt.show()
+#%%
+with sess.as_default():
+    pred=decoder(encoder(x_batches[0])).eval()
+    for i in range(10):
+        plt.figure()
+        plt.imshow((pred[i,:,:,0]),cmap='gray')
+    plt.show()
 
