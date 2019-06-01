@@ -29,7 +29,7 @@ import sklearn
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.datasets import fetch_openml
 #%%
-epochs = 1
+epochs = 13
 batch_size=10000
 
 
@@ -110,6 +110,7 @@ def Decoder(input_shape):
         
     
     #%%Create models    
+train = True
 session = tf.Session()
 with session.as_default():
     input_shape = x_batches.shape[2:]
@@ -121,34 +122,41 @@ with session.as_default():
     inputs=Input(input_shape)
     encoded=encoder(inputs)
     decoded=decoder(encoded)
-    
     saver = tf.train.Saver()
-    saver.restore(session,"data\\model.ckpt")
+    if not train:
+        saver.restore(session,"data\\model.ckpt")
     
     model=tf.keras.Model(inputs=inputs,outputs=decoded)
     model.compile('adam', loss=lambda yt,yp: MSE(inputs, decoded))
     loss=[]
-    for i in range(epochs): 
-        batch_idx = random.randint(0,x_batches.shape[0]-1)
-        shuffle_idx = np.random.permutation(batch_size)
-       
-        history=model.fit(x_batches[batch_idx,shuffle_idx], y_batches[batch_idx,shuffle_idx])
-        loss+=[history.history['loss']]
+    if train:
+        for i in range(epochs): 
+            batch_idx = random.randint(0,x_batches.shape[0]-1)
+            shuffle_idx = np.random.permutation(batch_size)
+            history=model.fit(x_batches[batch_idx,shuffle_idx], y_batches[batch_idx,shuffle_idx])
+            loss+=[history.history['loss']]
     
     saver.save(session,"data\\model.ckpt")    
     plt.plot(loss)
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
-        #%%
 
     pred=decoder(encoder(x_batches[0])).eval()
-#    for i in range(10):
-#        plt.figure()
-#        plt.imshow((pred[i,:,:,0]),cmap='gray')
     
+    plt.figure()
+    for i in range(10):
+        plt.subplot(2,5,i+1)
+    
+
+        plt.imshow((pred[i,:,:,0]),cmap='gray')
+    plt.show()
     pred=encoder(data_x_train).eval()
     test_encoded = encoder(data_x_test).eval()
+#%%
+data_y_train = np.array( [int (item) for item in data_y_train])
+data_y_test = np.array( [int (item) for item in data_y_test])
+
 #%%
 
 plt.figure()
@@ -165,10 +173,8 @@ plt.legend()
 plt.show()
 
 #%%
-data_y_train = np.array( [int (item) for item in data_y_train])
-data_y_test = np.array( [int (item) for item in data_y_test])
 nbrs=KNeighborsClassifier(n_neighbors=1).fit(pred[:,0,:,0],data_y_train)
-#%%
+
 pred_y_test=nbrs.predict(test_encoded[:,0,:,0])
 
 
